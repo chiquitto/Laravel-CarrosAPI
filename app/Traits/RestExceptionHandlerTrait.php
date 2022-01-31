@@ -27,7 +27,7 @@ trait RestExceptionHandlerTrait
                 $retval = $this->validationException($e);
                 break;
             default:
-                $retval = $this->badRequest();
+                $retval = $this->badRequest($e);
         }
 
         return $retval;
@@ -40,11 +40,12 @@ trait RestExceptionHandlerTrait
      * @param int $statusCode
      * @return \Illuminate\Http\JsonResponse
      */
-    protected function badRequest()
+    protected function badRequest(Exception $e)
     {
         return $this->jsonResponse([
             'error' => true,
-            'errorMessage' => 'badRequest'
+            'errorCode' => 'badRequest',
+            'errorMessage' => $e->getMessage()
         ], 400);
     }
 
@@ -59,7 +60,7 @@ trait RestExceptionHandlerTrait
     {
         return $this->jsonResponse([
             'error' => true,
-            'errorMessage' => 'recordNotFound'
+            'errorCode' => 'recordNotFound'
         ], 404);
     }
 
@@ -70,7 +71,7 @@ trait RestExceptionHandlerTrait
 
         return $this->jsonResponse([
             'error' => true,
-            'errorMessage' => 'validationError',
+            'errorCode' => 'validationError',
             'data' => $val->attributes(),
             'validatorMessages' => $e->validator->errors()
         ], 400);

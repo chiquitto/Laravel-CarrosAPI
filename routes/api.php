@@ -21,3 +21,5 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 Route::apiResource('marca', \App\Http\Controllers\Api\MarcaController::class)
     // ->except('destroy')
 ;
+
+Route::apiResource('veiculo', \App\Http\Controllers\Api\VeiculoController::class);
