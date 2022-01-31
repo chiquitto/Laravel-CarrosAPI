@@ -17,8 +17,9 @@ class CreateVeiculosTable extends Migration
             $table->id();
             $table->foreignId('marca_id');
             $table->char('placa', 7);
-            $table->text('modelo');
+            $table->string('modelo', 30);
             $table->year('ano');
+            $table->string('ownerid', 30);
             // $table->text('image')->nullable();
             $table->timestamps();
         });

@@ -19,6 +19,7 @@ class MarcaFactory extends Factory
 
         return [
             'marca' => $this->faker->title(7), // $v['brand']
+            'ownerid' => 'chiquitto',
         ];
     }
 }

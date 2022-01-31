@@ -18,8 +18,8 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
 
-Route::apiResource('marca', \App\Http\Controllers\Api\MarcaController::class)
-    // ->except('destroy')
-;
+Route::apiResource('{ownerid}/marca', \App\Http\Controllers\Api\MarcaController::class)
+    ->where(['ownerid' => '[0-9a-zA-Z\-]{1,30}']);
 
-Route::apiResource('veiculo', \App\Http\Controllers\Api\VeiculoController::class);
+Route::apiResource('{ownerid}/veiculo', \App\Http\Controllers\Api\VeiculoController::class)
+    ->where(['ownerid' => '[0-9a-zA-Z\-]{1,30}']);

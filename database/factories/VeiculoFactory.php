@@ -23,6 +23,7 @@ class VeiculoFactory extends Factory
             'modelo' => $v['model'],
             'placa' => $this->faker->vehicleRegistration('[A-Z]{3}[0-9][0-9A-Z][0-9]{2}'),
             'ano' => $this->faker->biasedNumberBetween(1990, date('Y')),
+            'ownerid' => 'chiquitto',
         ];
     }
 }
