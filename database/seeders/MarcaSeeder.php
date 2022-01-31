@@ -15,9 +15,9 @@ class MarcaSeeder extends Seeder
      */
     public function run()
     {
-        Marca::factory()
-            ->count(5)
+        /*Marca::factory()
+            ->count(100)
             ->has(Veiculo::factory()->count(5))
-            ->create();
+            ->create();*/
     }
 }

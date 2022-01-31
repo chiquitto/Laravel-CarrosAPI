@@ -10,6 +10,6 @@ class Veiculo extends Model
     use HasFactory;
 
     public function marca() {
-        $this->belongsTo(Marca::class);
+        return $this->belongsTo(Marca::class);
     }
 }
