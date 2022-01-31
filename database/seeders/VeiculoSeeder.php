@@ -18,7 +18,7 @@ class VeiculoSeeder extends Seeder
      */
     public function run()
     {
-        $count = 10;
+        $count = mt_rand(7, 13);
         $brands = array_keys(Fakecar::getRandomElementsFromArray(CarData::getBrandsWithModels(), $count));
 
         foreach ($brands as $brandName) {
@@ -29,7 +29,7 @@ class VeiculoSeeder extends Seeder
 
             Veiculo::factory()
                 ->for($marca)
-                ->count(3)
+                ->count(mt_rand(3, 6))
                 ->state(new Sequence(
                     function ($sequence) use ($brandName) {
                         return [

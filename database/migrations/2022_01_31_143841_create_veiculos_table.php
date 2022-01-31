@@ -16,7 +16,10 @@ class CreateVeiculosTable extends Migration
         Schema::create('veiculos', function (Blueprint $table) {
             $table->id();
             $table->foreignId('marca_id');
+            $table->char('placa', 7);
             $table->text('modelo');
+            $table->year('ano');
+            // $table->text('image')->nullable();
             $table->timestamps();
         });
     }
