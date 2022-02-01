@@ -2,9 +2,12 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Http\Resources\AbstractCollection;
 use App\Http\Resources\MarcaCollection;
 use App\Http\Resources\MarcaResource;
 use App\Models\Marca;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Illuminate\Database\Query\Builder;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
@@ -21,13 +24,15 @@ class MarcaController extends ApiController
     /**
      * Display a listing of the resource.
      *
-     * @return \Illuminate\Http\Response
+     * @param Request $request
+     * @return AbstractCollection
      */
-    public function index()
+    public function index(Request $request, $ownerid)
     {
 
         /** @var \Illuminate\Database\Eloquent\Builder $query */
-        $query = Marca::latest();
+        $query = Marca::latest()
+            ->where('ownerid', $ownerid);
 
         /** @var \Illuminate\Database\Eloquent\Collection $data */
         $data = $query->get();
@@ -41,7 +46,7 @@ class MarcaController extends ApiController
      * @param \Illuminate\Http\Request $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
+    public function store(Request $request, $ownerid)
     {
         $validator = $this->validatorMake(self::ACTION_STORE, $request);
 
@@ -50,7 +55,8 @@ class MarcaController extends ApiController
         }
 
         $marca = Marca::create([
-            'marca' => $request->marca
+            'marca' => $request->marca,
+            'ownerid' => $ownerid,
         ]);
 
         return $this->responseOk(new MarcaResource($marca));
@@ -62,10 +68,10 @@ class MarcaController extends ApiController
      * @param \App\Models\Marca $marca
      * @return \Illuminate\Http\Response
      */
-    public function show($id)
+    public function show($ownerid, $id)
     {
         /** @var Marca $marca */
-        $marca = Marca::findOrFail($id);
+        $marca = $this->findMarca($ownerid, $id);
         return $this->responseOk(new MarcaResource($marca));
     }
 
@@ -76,10 +82,10 @@ class MarcaController extends ApiController
      * @param \App\Models\Marca $marca
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function update(Request $request, $ownerid, $id)
     {
         /** @var Marca $marca */
-        $marca = Marca::findOrFail($id);
+        $marca = $this->findMarca($ownerid, $id);
 
         $validator = $this->validatorMake(self::ACTION_UPDATE, $request, $marca);
 
@@ -99,10 +105,10 @@ class MarcaController extends ApiController
      * @param \App\Models\Marca $marca
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id)
+    public function destroy($ownerid, $id)
     {
         /** @var Marca $marca */
-        $marca = Marca::findOrFail($id);
+        $marca = $this->findMarca($ownerid, $id);
         $marca->delete();
 
         return $this->responseOk(new MarcaResource($marca));
@@ -110,21 +116,50 @@ class MarcaController extends ApiController
 
     private function validatorMake($action, $request, $marca = null)
     {
-        $marcaUniqueRule = Rule::unique('marcas');
+
         if ($action == self::ACTION_UPDATE) {
-            $marcaUniqueRule = $marcaUniqueRule->ignore($marca->id);
+            // $marcaUniqueRule = Rule::unique('marcas')->ignore($marca->id);
+            $marcaUniqueRule = Rule::unique('marcas')
+                ->where(function (Builder $query) use ($request, $marca) {
+                    return $query
+                        ->where('ownerid', $request->route('ownerid'))
+                        ->where('id', '<>', $marca->id);
+                });
+        } else {
+            $marcaUniqueRule = Rule::unique('marcas')->where(function ($query) use ($request) {
+                return $query->where('ownerid', $request->route('ownerid'));
+            });
         }
 
         return Validator::make($request->all(), [
             'marca' => [
                 'required',
                 'string',
-                'max:15',
+                'max:30',
                 $marcaUniqueRule,
                 //Rule::exists('marca')->where(function ($query) {
                 //    return $query->where('account_id', 1);
                 //}),
             ],
         ]);
+    }
+
+    /**
+     * @param $ownerid
+     * @param $id
+     * @return Marca
+     */
+    private function findMarca($ownerid, $id)
+    {
+        /** @var Marca $marca */
+        $marca = Marca::findOrFail($id);
+
+        if ($ownerid != $marca->ownerid) {
+            throw (new ModelNotFoundException)->setModel(
+                Marca::class, $id
+            );
+        }
+
+        return $marca;
     }
 }

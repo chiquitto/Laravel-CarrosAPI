@@ -45,6 +45,7 @@ trait RestExceptionHandlerTrait
         return $this->jsonResponse([
             'error' => true,
             'errorCode' => 'badRequest',
+            'errorType' => get_class($e),
             'errorMessage' => $e->getMessage()
         ], 400);
     }

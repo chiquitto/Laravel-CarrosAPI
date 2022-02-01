@@ -9,7 +9,7 @@ class Marca extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['marca'];
+    protected $fillable = ['marca', 'ownerid'];
 
     public function veiculos() {
         return $this->hasMany(Veiculo::class);
