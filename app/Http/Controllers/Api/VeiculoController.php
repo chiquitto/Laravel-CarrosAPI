@@ -2,14 +2,13 @@
 
 namespace App\Http\Controllers\Api;
 
-use App\Http\Resources\MarcaResource;
 use App\Http\Resources\VeiculoCollection;
 use App\Http\Resources\VeiculoResource;
-use App\Models\Marca;
 use App\Models\Veiculo;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Database\Query\Builder;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
@@ -92,6 +91,45 @@ class VeiculoController extends ApiController
         $veiculo->placa = $request->placa;
         $veiculo->modelo = $request->modelo;
         $veiculo->ano = $request->ano;
+        $veiculo->save();
+
+        return $this->responseOk(new VeiculoResource($veiculo));
+    }
+
+    /**
+     * @param Request $request
+     * @param $ownerid
+     * @param $id
+     * @return mixed
+     * @throws ValidationException
+     *
+     * @link https://medium.com/@nishantbhushan10/upload-image-using-rest-api-in-laravel-cb70d8ce0757
+     */
+    public function uploadImagem(Request $request, $ownerid, $id)
+    {
+        /** @var Veiculo $veiculo */
+        $veiculo = $this->findVeiculo($ownerid, $id);
+
+        $validator = Validator::make($request->all(), [
+            'figura' => 'required|image|mimes:jpg,png|max:2048'
+        ]);
+        if ($validator->fails()) {
+            throw new ValidationException($validator);
+        }
+
+        $uploadFolder = 'veiculos';
+        $image = $request->file('figura');
+        $image_uploaded_path = $image->store($uploadFolder, 'public');
+
+        /** @var \Illuminate\Filesystem\FilesystemAdapter $storage */
+        //$storage = Storage::disk('public');
+        //return $storage->url($image_uploaded_path);
+
+        if (!is_null($veiculo->figura)) {
+            Storage::disk('public')->delete($veiculo->figura);
+        }
+
+        $veiculo->figura = $image_uploaded_path;
         $veiculo->save();
 
         return $this->responseOk(new VeiculoResource($veiculo));

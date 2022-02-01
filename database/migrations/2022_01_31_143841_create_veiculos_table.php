@@ -20,7 +20,7 @@ class CreateVeiculosTable extends Migration
             $table->string('modelo', 30);
             $table->year('ano');
             $table->string('ownerid', 30);
-            // $table->text('image')->nullable();
+            $table->text('figura')->nullable();
             $table->timestamps();
         });
     }
