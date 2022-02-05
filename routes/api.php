@@ -24,6 +24,6 @@ Route::apiResource('{ownerid}/marca', \App\Http\Controllers\Api\MarcaController:
 Route::apiResource('{ownerid}/veiculo', \App\Http\Controllers\Api\VeiculoController::class)
     ->where(['ownerid' => '[0-9a-zA-Z\-]{1,30}']);
 
-Route::post('{ownerid}/veiculo/{veiculo}/imagem', [\App\Http\Controllers\Api\VeiculoController::class, 'uploadImagem'])
+Route::post('{ownerid}/veiculo/{veiculo}/imagem', 'App\Http\Controllers\Api\VeiculoController@uploadImagem')
     ->where(['ownerid' => '[0-9a-zA-Z\-]{1,30}'])
     ->name('veiculo.imagem');

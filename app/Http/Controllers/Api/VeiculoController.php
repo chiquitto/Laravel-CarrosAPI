@@ -22,7 +22,6 @@ class VeiculoController extends ApiController
      */
     public function index(Request $request, $ownerid)
     {
-
         /** @var \Illuminate\Database\Eloquent\Builder $query */
         $query = Veiculo::latest()
             ->where('ownerid', $ownerid);
@@ -109,7 +108,7 @@ class VeiculoController extends ApiController
     {
         /** @var Veiculo $veiculo */
         $veiculo = $this->findVeiculo($ownerid, $id);
-
+        
         $validator = Validator::make($request->all(), [
             'figura' => 'required|image|mimes:jpg,png|max:2048'
         ]);
